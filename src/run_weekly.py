@@ -1,12 +1,7 @@
 import argparse
 import json
 
-from .config import (
-    EMAIL_PREVIEW_PATH,
-    FORECAST_PATH,
-    RECIPIENTS_RAW,
-    parse_recipients,
-)
+from .config import EMAIL_PREVIEW_PATH, FORECAST_PATH, RECIPIENTS_RAW, parse_recipients
 from .data_sources import get_yahoo_weekly_data
 from .email_builder import build_html, build_subject
 from .email_sender import send_email
@@ -47,11 +42,15 @@ def build_facts(df, forecast):
             None if fertiliser is None or fertiliser != fertiliser else round(float(fertiliser) * 100, 1)
         ),
         "munster_temperature_anomaly_c": (
-            None if latest.get("munster_temp_anomaly") is None or latest.get("munster_temp_anomaly") != latest.get("munster_temp_anomaly")
+            None
+            if latest.get("munster_temp_anomaly") is None
+            or latest.get("munster_temp_anomaly") != latest.get("munster_temp_anomaly")
             else round(float(latest["munster_temp_anomaly"]), 1)
         ),
         "munster_rain_anomaly_pct": (
-            None if latest.get("munster_rain_anomaly") is None or latest.get("munster_rain_anomaly") != latest.get("munster_rain_anomaly")
+            None
+            if latest.get("munster_rain_anomaly") is None
+            or latest.get("munster_rain_anomaly") != latest.get("munster_rain_anomaly")
             else round(float(latest["munster_rain_anomaly"]) * 100, 1)
         ),
         "model_beats_naive_baseline": forecast["beats_naive"],

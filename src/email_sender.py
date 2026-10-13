@@ -18,10 +18,7 @@ def send_email(subject: str, html: str, recipients: list[dict]) -> dict:
             "email": SENDER_EMAIL,
             "name": SENDER_NAME,
         },
-        "to": [
-            {"email": r["email"], "name": r["name"]}
-            for r in recipients
-        ],
+        "to": [{"email": r["email"], "name": r["name"]} for r in recipients],
         "subject": subject,
         "htmlContent": html,
     }
@@ -38,8 +35,6 @@ def send_email(subject: str, html: str, recipients: list[dict]) -> dict:
     )
 
     if response.status_code not in (200, 201, 202):
-        raise RuntimeError(
-            f"Brevo email send failed: {response.status_code} {response.text}"
-        )
+        raise RuntimeError(f"Brevo email send failed: {response.status_code} {response.text}")
 
     return response.json()

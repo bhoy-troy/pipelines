@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from io import BytesIO
 
 import numpy as np
@@ -7,12 +7,7 @@ import pandas as pd
 import requests
 import yfinance as yf
 
-from  .config import (
-    GDT_RESULTS_URL,
-    WEATHER_LOCATIONS,
-    WORLD_BANK_PINK_SHEET_URL,
-    YAHOO_TICKERS,
-)
+from .config import GDT_RESULTS_URL, WEATHER_LOCATIONS, WORLD_BANK_PINK_SHEET_URL, YAHOO_TICKERS
 
 
 def get_yahoo_weekly_data(years: int = 2) -> pd.DataFrame:
@@ -36,13 +31,7 @@ def get_yahoo_weekly_data(years: int = 2) -> pd.DataFrame:
         if isinstance(close, pd.DataFrame):
             close = close.iloc[:, 0]
 
-        weekly = (
-            close.dropna()
-            .resample("W-SUN")
-            .last()
-            .rename(name)
-            .to_frame()
-        )
+        weekly = close.dropna().resample("W-SUN").last().rename(name).to_frame()
         frames.append(weekly)
 
     data = pd.concat(frames, axis=1)
@@ -53,7 +42,7 @@ def get_yahoo_weekly_data(years: int = 2) -> pd.DataFrame:
 
 def get_open_meteo_weather() -> pd.DataFrame:
     """Return weekly rainfall and mean-temperature anomalies for selected dairy regions."""
-    end_date = datetime.now(timezone.utc).date()
+    end_date = datetime.now(UTC).date()
     start_date = end_date - timedelta(days=730)
 
     rows = []
@@ -107,12 +96,16 @@ def get_fertiliser_data() -> pd.DataFrame:
 
     # The Pink Sheet layout can change. Find likely fertiliser columns dynamically.
     candidates = [
-        col for col in xls.columns
-        if isinstance(col, str) and any(word in col.lower() for word in ["fertilizer", "fertiliser", "phosphate", "potassium", "nitrogen", "urea", "dap"])
+        col
+        for col in xls.columns
+        if isinstance(col, str)
+        and any(
+            word in col.lower()
+            for word in ["fertilizer", "fertiliser", "phosphate", "potassium", "nitrogen", "urea", "dap"]
+        )
     ]
 
     if not candidates:
-
         raise RuntimeError("Could not identify fertiliser columns in World Bank Pink Sheet")
 
     date_col = xls.columns[0]

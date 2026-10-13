@@ -1,7 +1,6 @@
-import numpy as np
 import pandas as pd
 
-from  .data_sources import get_fertiliser_data, get_latest_gdt_change, get_open_meteo_weather
+from .data_sources import get_fertiliser_data, get_latest_gdt_change, get_open_meteo_weather
 
 
 def build_feature_table(market_data: pd.DataFrame) -> pd.DataFrame:
@@ -98,7 +97,6 @@ FEATURE_COLUMNS = [
 ]
 
 WEATHER_FEATURES = [
-    col for col in [
         "munster_temp_anomaly",
         "munster_rain_anomaly",
         "northern_ireland_temp_anomaly",
@@ -108,7 +106,6 @@ WEATHER_FEATURES = [
         "waikato_nz_temp_anomaly",
         "waikato_nz_rain_anomaly",
     ]
-]
 
 FEATURE_COLUMNS += WEATHER_FEATURES
 

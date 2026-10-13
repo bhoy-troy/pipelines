@@ -6,7 +6,6 @@ import requests
 
 from .config import DEEPSEEK_API_KEY, GEMINI_API_KEY, GEMINI_MODEL, GROQ_API_KEY
 
-
 SYSTEM_PROMPT = """You are an experienced Irish farm advisor writing a short Monday dairy-market update.
 
 Your reader is an Irish dairy farmer. Write in plain English. All prices should be discussed in euro terms. Avoid financial jargon, technical model language, and speculation.
@@ -70,10 +69,7 @@ def _clean_json(text: str) -> dict:
 
 
 def _gemini_commentary(data: dict) -> dict:
-    url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
-    )
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
 
     payload = {
         "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
@@ -187,9 +183,7 @@ def generate_commentary(facts: dict) -> dict:
             "Feed, energy and currency movements are included in the weekly outlook.",
             "The latest global dairy auction signal is included where available.",
         ],
-        "watch": [
-            "Watch feed costs and currency movements, as both can affect farm margins."
-        ],
+        "watch": ["Watch feed costs and currency movements, as both can affect farm margins."],
         "plain_english_summary": summary,
         "fallback_used": True,
         "llm_errors": errors,

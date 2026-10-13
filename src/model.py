@@ -1,21 +1,16 @@
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import joblib
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import TimeSeriesSplit
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from .config import (
-    BACKTEST_PATH,
-    FEATURES_PATH,
-    MODEL_PATH,
-)
-from .features import FEATURE_COLUMNS, build_feature_table, make_supervised
+from .config import BACKTEST_PATH, FEATURES_PATH, MODEL_PATH
+from .features import FEATURE_COLUMNS, make_supervised
 
 
 def build_model() -> Pipeline:
@@ -56,7 +51,7 @@ def train_and_evaluate(df: pd.DataFrame):
         {
             "model": final_model,
             "feature_columns": FEATURE_COLUMNS,
-            "trained_at": datetime.now(timezone.utc).isoformat(),
+            "trained_at": datetime.now(UTC).isoformat(),
             "model_mae": model_mae,
             "naive_mae": naive_mae,
             "residual_std": residual_std,
@@ -65,7 +60,7 @@ def train_and_evaluate(df: pd.DataFrame):
     )
 
     report = {
-        "trained_at": datetime.now(timezone.utc).isoformat(),
+        "trained_at": datetime.now(UTC).isoformat(),
         "observations": int(len(X)),
         "test_observations": int(len(X_test)),
         "model_mae_usd_cwt": round(model_mae, 4),
@@ -80,9 +75,7 @@ def train_and_evaluate(df: pd.DataFrame):
 
 def load_model():
     if not MODEL_PATH.exists():
-        raise FileNotFoundError(
-            "Model not found. Run: python -m src.run_weekly --train-only"
-        )
+        raise FileNotFoundError("Model not found. Run: python -m src.run_weekly --train-only")
     return joblib.load(MODEL_PATH)
 
 
@@ -111,7 +104,7 @@ def predict_next_week(df: pd.DataFrame):
     upper = prediction + residual_std
 
     forecast = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "week_end": str(latest.index[0].date()),
         "last_price_usd_cwt": round(last_price, 2),
         "forecast_price_usd_cwt": round(prediction, 2),

@@ -48,16 +48,10 @@ def build_html(forecast: dict, commentary: dict, eurusd: float) -> str:
     upper_eur = usd_to_eur_cwt(upper, eurusd)
     euro_litre = euro_litre_equivalent(forecast["forecast_price_usd_cwt"], eurusd)
 
-    why_items = "".join(
-        f'<li style="margin-bottom:8px;">{item}</li>' for item in commentary["why"]
-    )
-    watch_items = "".join(
-        f'<li style="margin-bottom:8px;">{item}</li>' for item in commentary["watch"]
-    )
+    why_items = "".join(f'<li style="margin-bottom:8px;">{item}</li>' for item in commentary["why"])
+    watch_items = "".join(f'<li style="margin-bottom:8px;">{item}</li>' for item in commentary["watch"])
 
-    updated = datetime.fromisoformat(
-        forecast["model_updated_at"].replace("Z", "+00:00")
-    ).strftime("%d %b %Y")
+    updated = datetime.fromisoformat(forecast["model_updated_at"].replace("Z", "+00:00")).strftime("%d %b %Y")
 
     return f"""<!doctype html>
 <html>
@@ -70,7 +64,7 @@ def build_html(forecast: dict, commentary: dict, eurusd: float) -> str:
         <p style="margin:0 0 6px;font-size:16px;">
           Last week's benchmark price:<br>
           <strong style="font-size:22px;">\u20ac{last_eur:.2f} per cwt</strong>
-          <span style="font-size:14px;color:#6b7280;">(${forecast['last_price_usd_cwt']:.2f})</span>
+          <span style="font-size:14px;color:#6b7280;">(${forecast["last_price_usd_cwt"]:.2f})</span>
         </p>
 
         <p style="margin:0 0 18px;font-size:16px;">
@@ -78,7 +72,7 @@ def build_html(forecast: dict, commentary: dict, eurusd: float) -> str:
           <strong style="font-size:26px;color:{colour};">
             \u20ac{forecast_eur:.2f} per cwt {arrow}
           </strong>
-          <span style="font-size:14px;color:#6b7280;">(${forecast['forecast_price_usd_cwt']:.2f})</span><br>
+          <span style="font-size:14px;color:#6b7280;">(${forecast["forecast_price_usd_cwt"]:.2f})</span><br>
           <span style="color:{colour};font-weight:600;">{direction_text}</span>
         </p>
 
@@ -99,7 +93,7 @@ def build_html(forecast: dict, commentary: dict, eurusd: float) -> str:
         </ul>
 
         <p style="margin:0 0 14px;font-size:15px;line-height:1.45;">
-          {commentary['plain_english_summary']}
+          {commentary["plain_english_summary"]}
         </p>
 
         <p style="margin:0;font-size:13px;color:#6b7280;">

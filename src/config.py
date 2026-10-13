@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -46,14 +47,13 @@ WEATHER_LOCATIONS = [
     ("Waikato NZ", -37.7, 175.2),
 ]
 
-WORLD_BANK_PINK_SHEET_URL = (
-    "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"
-)
+WORLD_BANK_PINK_SHEET_URL = "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"
 
 GDT_RESULTS_URL = "https://www.globaldairytrade.info/en/product-results"
 
 # GEMINI_MODEL = "gemini-flash-latest"
 GEMINI_MODEL = "gemini-3.8-flash"
+
 
 def parse_recipients(raw: str):
     recipients = []
@@ -63,8 +63,8 @@ def parse_recipients(raw: str):
         if not item:
             continue
         if "," not in item:
-            name = ''
-            email  = item
+            name = ""
+            email = item
         else:
             name, email = item.rsplit(",", 1)
         recipients.append({"name": name.strip(), "email": email.strip()})
