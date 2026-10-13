@@ -1,0 +1,78 @@
+# Registry push (image_build) uses these repository secrets when not using
+# ghcr.io with GITHUB_TOKEN:
+#   REGISTRY          - registry host (e.g. quay.io, registry.example.com)
+#   REGISTRY_USER     - login username
+#   REGISTRY_PASSWORD - login password or token
+# Optional:
+#   REGISTRY_IMAGE    - image repository path without tag (default: ghcr.io/<owner>/<repo>)
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["*"]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROJECT_NAME: pipelines
+
+jobs:
+  ruff-check:
+    name: Ruff Check
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/astral-sh/ruff:alpine
+    steps:
+      - uses: actions/checkout@v6
+      - name: Ruff version
+        run: ruff --version
+      - name: Ruff check
+        run: |
+          ruff check
+      - name: Ruff check (CodeQuality)
+        run: |
+          ruff check --output-format=github --output-file=code-quality-report.json
+      - name: Upload code quality report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ruff-code-quality
+          path: code-quality-report.json
+
+#  ruff-format:
+#    name: Ruff Format
+#    runs-on: ubuntu-latest
+#    container:
+#      image: ghcr.io/astral-sh/ruff:alpine
+#    steps:
+#      - uses: actions/checkout@v6
+#      - name: Ruff version
+#        run: ruff --version
+#      - name: Ruff format
+#        run: ruff format --diff
+
+  flake8:
+    runs-on: ubuntu-latest
+    container: python:3.14-alpine
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install flake8
+        run: pip install flake8-gl-codeclimate
+      - name: Flake8 version
+        run: flake8 --version
+      - name: Run flake8
+        run: |
+          flake8 --format gl-codeclimate \
+                 --output-file gl-code-quality-report.json \
+                 .
+      - name: Upload code quality report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: flake8-code-quality
+          path: gl-code-quality-report.json
