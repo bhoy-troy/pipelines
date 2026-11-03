@@ -1,4 +1,5 @@
 import re
+import time
 from datetime import UTC, datetime, timedelta
 from io import BytesIO
 
@@ -56,8 +57,15 @@ def get_open_meteo_weather() -> pd.DataFrame:
             "&timezone=UTC"
         )
 
-        response = requests.get(url, timeout=30)
-        response.raise_for_status()
+        for attempt in range(3):
+            try:
+                response = requests.get(url, timeout=30)
+                response.raise_for_status()
+                break
+            except requests.exceptions.Timeout, requests.exceptions.ConnectionError:
+                if attempt == 2:
+                    raise
+                time.sleep(5 * (attempt + 1))
         payload = response.json()
 
         daily = payload.get("daily", {})
