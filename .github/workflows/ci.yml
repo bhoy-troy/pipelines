@@ -44,35 +44,64 @@ jobs:
           name: ruff-code-quality
           path: code-quality-report.json
 
-#  ruff-format:
-#    name: Ruff Format
-#    runs-on: ubuntu-latest
-#    container:
-#      image: ghcr.io/astral-sh/ruff:alpine
-#    steps:
-#      - uses: actions/checkout@v6
-#      - name: Ruff version
-#        run: ruff --version
-#      - name: Ruff format
-#        run: ruff format --diff
-
-  flake8:
+  bandit:
+    name: Bandit Security Scan
     runs-on: ubuntu-latest
-    container: python:3.14-alpine
     steps:
       - uses: actions/checkout@v6
-      - name: Install flake8
-        run: pip install flake8-gl-codeclimate
-      - name: Flake8 version
-        run: flake8 --version
-      - name: Run flake8
-        run: |
-          flake8 --format gl-codeclimate \
-                 --output-file gl-code-quality-report.json \
-                 .
-      - name: Upload code quality report
-        if: always()
-        uses: actions/upload-artifact@v7
+      - uses: actions/setup-python@v5
         with:
-          name: flake8-code-quality
-          path: gl-code-quality-report.json
+          python-version: "3.14"
+      - run: pip install bandit
+      - name: Bandit scan
+        run: bandit -c pyproject.toml -r src/
+
+  ruff-format:
+    name: Ruff Format
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/astral-sh/ruff:alpine
+    steps:
+      - uses: actions/checkout@v6
+      - name: Ruff version
+        run: ruff --version
+
+      - name: Ruff format check
+        run: ruff format --check
+
+  image-build:
+    name: Build & Push Image
+    needs: [ruff-check, ruff-format, bandit]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+

@@ -97,15 +97,15 @@ FEATURE_COLUMNS = [
 ]
 
 WEATHER_FEATURES = [
-        "munster_temp_anomaly",
-        "munster_rain_anomaly",
-        "northern_ireland_temp_anomaly",
-        "northern_ireland_rain_anomaly",
-        "netherlands_temp_anomaly",
-        "netherlands_rain_anomaly",
-        "waikato_nz_temp_anomaly",
-        "waikato_nz_rain_anomaly",
-    ]
+    "munster_temp_anomaly",
+    "munster_rain_anomaly",
+    "northern_ireland_temp_anomaly",
+    "northern_ireland_rain_anomaly",
+    "netherlands_temp_anomaly",
+    "netherlands_rain_anomaly",
+    "waikato_nz_temp_anomaly",
+    "waikato_nz_rain_anomaly",
+]
 
 FEATURE_COLUMNS += WEATHER_FEATURES
 
